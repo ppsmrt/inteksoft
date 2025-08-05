@@ -84,6 +84,7 @@ section {
 
 .task-list li {
   background: var(--card-light);
+  color: var(--text-light); /* 👈 ensure visible text */
   padding: 15px 20px;
   margin-bottom: 15px;
   border-radius: 10px;
