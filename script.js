@@ -1,51 +1,49 @@
 const taskForm = document.getElementById('taskForm');
 const taskList = document.getElementById('taskList');
+const darkModeToggle = document.getElementById('darkModeToggle');
 const searchInput = document.getElementById('searchInput');
-const toggleTheme = document.getElementById('toggleTheme');
 
-function loadTasks() {
-  const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+function saveTasks() {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function renderTasks(filteredTasks = tasks) {
   taskList.innerHTML = '';
-  tasks.forEach((task, index) => {
+  filteredTasks.forEach((task, index) => {
     const li = document.createElement('li');
-    li.classList.add(`priority-${task.priority}`);
     li.innerHTML = `
       <strong>${task.title}</strong>
-      <div>${task.description}</div>
-      <div class="task-meta">By ${task.name} • ${task.priority} • ${task.timestamp}</div>
+      ${task.description}<br>
+      <span class="task-meta">Added by ${task.name} | ${task.priority} | ${task.timestamp}</span>
+      <button class="deleteBtn" onclick="deleteTask(${index})">Delete</button>
       <button class="editBtn" onclick="editTask(${index})">Edit</button>
-      <button class="deleteBtn" onclick="confirmDelete(${index})">Delete</button>
     `;
     taskList.appendChild(li);
   });
 }
 
-function confirmDelete(index) {
+function deleteTask(index) {
   if (confirm('Are you sure you want to delete this task?')) {
-    deleteTask(index);
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
   }
 }
 
-function deleteTask(index) {
-  const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-  tasks.splice(index, 1);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  loadTasks();
-}
-
 function editTask(index) {
-  const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
   const task = tasks[index];
   document.getElementById('taskName').value = task.name;
   document.getElementById('taskTitle').value = task.title;
   document.getElementById('taskDescription').value = task.description;
   document.getElementById('taskPriority').value = task.priority;
   tasks.splice(index, 1);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  loadTasks();
+  saveTasks();
+  renderTasks();
 }
 
-taskForm.addEventListener('submit', function(e) {
+taskForm.addEventListener('submit', function (e) {
   e.preventDefault();
   const name = document.getElementById('taskName').value.trim();
   const title = document.getElementById('taskTitle').value.trim();
@@ -53,27 +51,31 @@ taskForm.addEventListener('submit', function(e) {
   const priority = document.getElementById('taskPriority').value;
   const timestamp = new Date().toLocaleString();
 
-  if (name && title && description && priority) {
+  if (name && title && description) {
     const newTask = { name, title, description, priority, timestamp };
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     tasks.push(newTask);
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    saveTasks();
     taskForm.reset();
-    loadTasks();
+    renderTasks();
   }
 });
 
-searchInput.addEventListener('input', function() {
-  const query = this.value.toLowerCase();
-  const tasks = document.querySelectorAll('#taskList li');
-  tasks.forEach(task => {
-    const content = task.textContent.toLowerCase();
-    task.style.display = content.includes(query) ? '' : 'none';
-  });
+searchInput.addEventListener('input', () => {
+  const keyword = searchInput.value.toLowerCase();
+  const filtered = tasks.filter(task =>
+    task.title.toLowerCase().includes(keyword) ||
+    task.description.toLowerCase().includes(keyword) ||
+    task.name.toLowerCase().includes(keyword)
+  );
+  renderTasks(filtered);
 });
 
-toggleTheme.addEventListener('click', () => {
+darkModeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark');
 });
 
-loadTasks();
+renderTasks();
+```
+    }
+  ]
+}
