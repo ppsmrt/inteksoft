@@ -1,78 +1,70 @@
-import { db } from "./firebase-config.js";
+// Import Firebase SDK
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
+  getFirestore,
   collection,
   addDoc,
   getDocs,
   deleteDoc,
   doc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-const taskForm = document.getElementById("taskForm");
-const taskList = document.getElementById("taskList");
-
-const tasksRef = collection(db, "tasks");
-
-async function loadTasks() {
-  const querySnapshot = await getDocs(tasksRef);
-  taskList.innerHTML = "";
-
-  querySnapshot.forEach((docSnap) => {
-    const task = docSnap.data();
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      <div class="task-content">
-        <strong>${task.title}</strong>
-        <p>${task.description}</p>
-        <small>By: ${task.name} • Priority: ${task.priority} • Status: ${task.status || "Pending"}</small>
-      </div>
-      <div class="task-actions">
-        <button onclick="editTask('${docSnap.id}')">✏️ Edit</button>
-        <button onclick="deleteTask('${docSnap.id}')">🗑️ Delete</button>
-      </div>
-    `;
-    taskList.appendChild(li);
-  });
-}
-
-window.deleteTask = async function (id) {
-  await deleteDoc(doc(db, "tasks", id));
-  loadTasks();
+// Your Firebase Config (from your message)
+const firebaseConfig = {
+  apiKey: "AIzaSyAOdDEfI5_LA9wtk8WAdSq3XBn-ppoUHvY",
+  authDomain: "tasks-web-app-new.firebaseapp.com",
+  projectId: "tasks-web-app-new",
+  storageBucket: "tasks-web-app-new.firebasestorage.app",
+  messagingSenderId: "757740956566",
+  appId: "1:757740956566:web:1602a1c68d442591008bb7",
+  measurementId: "G-TZTG841QNJ"
 };
 
-window.editTask = async function (id) {
-  const newStatus = prompt("Update Status (Pending, In Progress, Done):");
-  if (!newStatus) return;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  await updateDoc(doc(db, "tasks", id), {
-    status: newStatus
-  });
+const taskForm = document.getElementById('taskForm');
+const taskList = document.getElementById('taskList');
 
-  loadTasks();
-};
-
-taskForm.addEventListener("submit", async (e) => {
+taskForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
 
-  const name = document.getElementById("taskName").value.trim();
-  const title = document.getElementById("taskTitle").value.trim();
-  const description = document.getElementById("taskDescription").value.trim();
-  const priority = document.getElementById("taskPriority").value;
+  if (!name || !title || !description) return;
 
-  if (!name || !title || !description || !priority) return;
-
-  await addDoc(tasksRef, {
+  await addDoc(collection(db, "tasks"), {
     name,
     title,
     description,
-    priority,
-    status: "Pending",
-    createdAt: new Date()
+    timestamp: Date.now()
   });
 
   taskForm.reset();
-  loadTasks();
 });
 
-loadTasks();
+const renderTasks = (tasks) => {
+  taskList.innerHTML = '';
+  tasks.forEach(docSnap => {
+    const task = docSnap.data();
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>${task.title}</strong>
+      <p>${task.description}</p>
+      <small>By: ${task.name}</small>
+      <button class="deleteBtn" onclick="deleteTask('${docSnap.id}')">Delete</button>
+    `;
+    taskList.appendChild(li);
+  });
+};
+
+// Sync tasks in real time
+onSnapshot(collection(db, "tasks"), (snapshot) => {
+  renderTasks(snapshot.docs);
+});
+
+window.deleteTask = async (id) => {
+  await deleteDoc(doc(db, "tasks", id));
+};
