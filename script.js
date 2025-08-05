@@ -1,3 +1,29 @@
+// Import the functions you need from the SDKs you need import { initializeApp } from "firebase/app"; import { getDatabase, ref, push, onValue, update, remove } from "firebase/database";
+
+const firebaseConfig = { apiKey: "AIzaSyAOdDEfI5_LA9wtk8WAdSq3XBn-ppoUHvY", authDomain: "tasks-web-app-new.firebaseapp.com", projectId: "tasks-web-app-new", storageBucket: "tasks-web-app-new.firebasestorage.app", messagingSenderId: "757740956566", appId: "1:757740956566:web:1602a1c68d442591008bb7", measurementId: "G-TZTG841QNJ" };
+
+const app = initializeApp(firebaseConfig); const db = getDatabase(app);
+
+const taskForm = document.getElementById("taskForm"); const taskList = document.getElementById("taskList");
+
+function renderTask(key, task) { const li = document.createElement("li"); li.className = "task-card"; li.innerHTML = <h3>${task.name}</h3> <p>${task.description}</p> <div class="task-actions"> <button class="edit-btn">Edit</button> <button class="delete-btn">Delete</button> </div>;
+
+const editBtn = li.querySelector(".edit-btn"); const deleteBtn = li.querySelector(".delete-btn");
+
+editBtn.onclick = () => { const newName = prompt("Edit task name", task.name); const newDesc = prompt("Edit task description", task.description); if (newName && newDesc) { update(ref(db, 'tasks/' + key), { name: newName, description: newDesc }); } };
+
+deleteBtn.onclick = () => { if (confirm("Are you sure you want to delete this task?")) { remove(ref(db, 'tasks/' + key)); } };
+
+li.setAttribute("data-key", key); return li; }
+
+onValue(ref(db, 'tasks'), (snapshot) => { taskList.innerHTML = ""; snapshot.forEach(childSnapshot => { const key = childSnapshot.key; const task = childSnapshot.val(); const taskElement = renderTask(key, task); taskList.appendChild(taskElement); }); });
+
+taskForm.addEventListener("submit", (e) => { e.preventDefault(); const name = document.getElementById("taskName").value.trim(); const description = document.getElementById("taskDescription").value.trim();
+
+if (name && description) { push(ref(db, 'tasks'), { name, description }); taskForm.reset(); } });
+
+
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, deleteDoc, updateDoc,
