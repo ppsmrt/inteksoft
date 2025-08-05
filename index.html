@@ -10,12 +10,24 @@
 <body>
   <div class="wrapper">
     <div class="task-container">
-      <h1 class="app-title">📋 Task Manager</h1>
+      <div class="top-bar">
+        <h1 class="app-title">📋 Task Manager</h1>
+        <button id="toggleTheme">🌙</button>
+      </div>
       <form id="taskForm" class="task-form">
+        <input type="text" id="taskName" placeholder="Your Name" required />
         <input type="text" id="taskTitle" placeholder="Task Title" required />
         <textarea id="taskDescription" placeholder="Task Description" required></textarea>
+        <select id="taskPriority" required>
+          <option value="" disabled selected>Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
         <button type="submit">➕ Add Task</button>
       </form>
+
+      <input type="text" id="searchInput" placeholder="🔍 Search tasks..." />
 
       <h2 class="task-heading">Your Tasks</h2>
       <ul id="taskList" class="task-list"></ul>
