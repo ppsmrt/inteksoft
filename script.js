@@ -1,3 +1,5 @@
+import { users } from './users.js';
+
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -90,7 +92,7 @@ function renderAdminPanel() {
   });
 }
 
-async function updateUser(index) {
+window.updateUser = async function(index) {
   const nameInput = document.querySelectorAll('.nameInput')[index];
   const passInput = document.querySelectorAll('.passInput')[index];
   const newName = nameInput.value.trim();
