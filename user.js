@@ -1,7 +1,7 @@
 export const users = [
   {
     username: 'member1',
-    passwordHash: '4b49e5a9716ee22d6a352c3f4b7b9e1a196a8b02c185d2d842c1a1f1fb5e7e29', // hash of "admin123"
+    passwordHash: '4b49e5a9716ee22d6a352c3f4b7b9e1a196a8b02c185d2d842c1a1f1fb5e7e29',
     displayName: 'Alice',
     isAdmin: true
   },
