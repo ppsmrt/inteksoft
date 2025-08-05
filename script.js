@@ -1,75 +1,57 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const taskForm = document.getElementById('taskForm');
+const taskList = document.getElementById('taskList');
+const themeToggle = document.getElementById('themeToggle');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAOdDEfI5_LA9wtk8WAdSq3XBn-ppoUHvY",
-  authDomain: "tasks-web-app-new.firebaseapp.com",
-  projectId: "tasks-web-app-new",
-  storageBucket: "tasks-web-app-new.firebasestorage.app",
-  messagingSenderId: "757740956566",
-  appId: "1:757740956566:web:1602a1c68d442591008bb7",
-  measurementId: "G-TZTG841QNJ"
-};
+// Load saved theme
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  themeToggle.checked = true;
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const taskForm = document.getElementById("taskForm");
-const taskList = document.getElementById("taskList");
-const themeToggle = document.getElementById("themeToggle");
-
-// 🌓 Toggle Dark Mode
+// Toggle theme
 themeToggle.addEventListener("change", () => {
   document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
 });
 
-taskForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById("taskName").value.trim();
-  const title = document.getElementById("taskTitle").value.trim();
-  const description = document.getElementById("taskDescription").value.trim();
-  const priority = document.getElementById("taskPriority").value;
-
-  if (!name || !title || !description) return;
-
-  await addDoc(collection(db, "tasks"), {
-    name,
-    title,
-    description,
-    priority,
-    timestamp: serverTimestamp()
-  });
-
-  taskForm.reset();
-});
-
-// Live updates
-onSnapshot(collection(db, "tasks"), (snapshot) => {
-  taskList.innerHTML = "";
-  snapshot.forEach((docSnap) => {
-    const task = docSnap.data();
-    const li = document.createElement("li");
+// Load tasks
+function loadTasks() {
+  const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  taskList.innerHTML = '';
+  tasks.forEach((task, index) => {
+    const li = document.createElement('li');
     li.innerHTML = `
-      <strong>${task.title}</strong><br>
-      <em>👤 ${task.name}</em><br>
-      <p>${task.description}</p>
-      <span>⏰ ${task.timestamp?.toDate().toLocaleString() || 'Just now'}</span><br>
-      <span>🚦 Priority: ${task.priority}</span>
-      <button class="deleteBtn" onclick="deleteTask('${docSnap.id}')">Delete</button>
+      <div class="name">👤 ${task.name}</div>
+      <strong>${task.title}</strong>
+      ${task.description}
+      <button class="deleteBtn" onclick="deleteTask(${index})">Delete</button>
     `;
     taskList.appendChild(li);
   });
+}
+
+// Delete task
+function deleteTask(index) {
+  const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  tasks.splice(index, 1);
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+  loadTasks();
+}
+
+// Add task
+taskForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('taskName').value.trim();
+  const title = document.getElementById('taskTitle').value.trim();
+  const description = document.getElementById('taskDescription').value.trim();
+  if (name && title && description) {
+    const newTask = { name, title, description };
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.push(newTask);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    taskForm.reset();
+    loadTasks();
+  }
 });
 
-// Delete function (attached to global scope)
-window.deleteTask = async function(id) {
-  await deleteDoc(doc(db, "tasks", id));
-};
+loadTasks();
