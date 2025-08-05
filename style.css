@@ -1,160 +1,130 @@
 :root {
-  --bg: #f0f4ff;
-  --card: #ffffff;
-  --text: #333;
+  --bg: #121212;
+  --card: #1e1e1e;
+  --primary: #4a63e7;
+  --text: #fff;
+  --muted: #aaa;
   --low: #2ecc71;
   --med: #f39c12;
   --high: #e74c3c;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a1a2e;
-    --card: #2e2e42;
-    --text: #eee;
-  }
-}
-
 body {
+  margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  padding: 0 16px 80px;
 }
 
-.task-container {
-  max-width: 500px;
+.container {
+  max-width: 600px;
   margin: auto;
-  background: var(--card);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  padding-top: 20px;
 }
 
 .app-title {
   text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: #4a63e7;
-}
-
-.task-form .form-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--primary);
 }
 
 .task-form input,
-.task-form textarea,
-.task-form select {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background: var(--bg);
+.task-form textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--card);
   color: var(--text);
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
-.task-form button {
-  padding: 10px 16px;
-  background: #4a63e7;
+.task-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label { font-weight: 500; margin-bottom: 6px; display: block; }
+
+.radio-group label { margin-right: 12px; cursor: pointer; }
+
+.fab {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  transition: background 0.3s;
 }
 
-.task-form button:hover {
-  background: #3c4ec2;
-}
+.fab:hover { background: #3548c7; }
 
 .task-heading {
-  margin: 20px 0 10px;
-  font-size: 1.2rem;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 6px;
+  margin: 30px 0 12px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
-.task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.task-list { display: flex; flex-direction: column; gap: 16px; }
 
-.task-list li {
-  position: relative;
+.task-card {
   background: var(--card);
-  border-left: 6px solid var(--low);
-  margin-bottom: 12px;
-  padding: 14px 18px;
-  border-radius: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  position: relative;
   transition: transform 0.2s;
 }
 
-.task-list li:hover {
-  transform: translateY(-2px);
-}
+.task-card:hover { transform: translateY(-3px); }
 
-.task-list li[data-priority="Medium"] {
-  border-left-color: var(--med);
-}
+.task-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
 
-.task-list li[data-priority="High"] {
-  border-left-color: var(--high);
-}
-
-.task-list strong {
-  font-size: 1rem;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.task-details {
-  font-size: 0.9rem;
+.task-desc {
+  font-size: 15px;
   margin-bottom: 8px;
+  color: var(--muted);
 }
 
 .task-meta {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 13px;
+  color: var(--muted);
 }
 
-.task-list button.deleteBtn,
-.task-list button.editBtn {
+.task-priority[priority="Low"] { border-left: 6px solid var(--low); }
+.task-priority[priority="Medium"] { border-left: 6px solid var(--med); }
+.task-priority[priority="High"] { border-left: 6px solid var(--high); }
+
+.editBtn, .deleteBtn, .statusBtn {
   position: absolute;
-  top: 12px;
-  background: #ff4d4f;
+  top: 14px;
   border: none;
-  padding: 5px 8px;
-  font-size: 0.8rem;
-  color: white;
   border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
   cursor: pointer;
+  color: #fff;
 }
+.editBtn { right: 60px; background: #3498db; }
+.deleteBtn { right: 14px; background: #ff4d4f; }
+.statusBtn { top: auto; bottom: 14px; right: 14px; background: #888; }
 
-.task-list button.editBtn {
-  right: 50px;
-  background: #3498db;
-}
-
-.task-list button.deleteBtn {
-  right: 12px;
-}
-
-.task-list button.deleteBtn:hover {
-  background: #d9363e;
-}
-
-.task-list button.editBtn:hover {
-  background: #2980b9;
-}
-
-.footer {
+footer {
   text-align: center;
   margin-top: 20px;
-  font-size: 0.9rem;
-  color: #777;
+  font-size: 14px;
+  color: var(--muted);
 }
