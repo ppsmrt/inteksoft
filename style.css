@@ -117,3 +117,11 @@ footer {
   font-size: 14px;
   color: #777;
 }
+
+/* Light mode fix */
+@media (prefers-color-scheme: light) {
+  .task-list li {
+    background: var(--card-light);
+    color: var(--text-light); /* Set text color to black */
+  }
+}
