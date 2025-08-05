@@ -1,81 +1,75 @@
-const taskForm = document.getElementById('taskForm');
-const taskList = document.getElementById('taskList');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const searchInput = document.getElementById('searchInput');
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+const firebaseConfig = {
+  apiKey: "AIzaSyAOdDEfI5_LA9wtk8WAdSq3XBn-ppoUHvY",
+  authDomain: "tasks-web-app-new.firebaseapp.com",
+  projectId: "tasks-web-app-new",
+  storageBucket: "tasks-web-app-new.firebasestorage.app",
+  messagingSenderId: "757740956566",
+  appId: "1:757740956566:web:1602a1c68d442591008bb7",
+  measurementId: "G-TZTG841QNJ"
+};
 
-function saveTasks() {
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const taskForm = document.getElementById("taskForm");
+const taskList = document.getElementById("taskList");
+const themeToggle = document.getElementById("themeToggle");
 
-function renderTasks(filteredTasks = tasks) {
-  taskList.innerHTML = '';
-  filteredTasks.forEach((task, index) => {
-    const li = document.createElement('li');
+// 🌓 Toggle Dark Mode
+themeToggle.addEventListener("change", () => {
+  document.body.classList.toggle("dark");
+});
+
+taskForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("taskName").value.trim();
+  const title = document.getElementById("taskTitle").value.trim();
+  const description = document.getElementById("taskDescription").value.trim();
+  const priority = document.getElementById("taskPriority").value;
+
+  if (!name || !title || !description) return;
+
+  await addDoc(collection(db, "tasks"), {
+    name,
+    title,
+    description,
+    priority,
+    timestamp: serverTimestamp()
+  });
+
+  taskForm.reset();
+});
+
+// Live updates
+onSnapshot(collection(db, "tasks"), (snapshot) => {
+  taskList.innerHTML = "";
+  snapshot.forEach((docSnap) => {
+    const task = docSnap.data();
+    const li = document.createElement("li");
     li.innerHTML = `
-      <strong>${task.title}</strong>
-      ${task.description}<br>
-      <span class="task-meta">Added by ${task.name} | ${task.priority} | ${task.timestamp}</span>
-      <button class="deleteBtn" onclick="deleteTask(${index})">Delete</button>
-      <button class="editBtn" onclick="editTask(${index})">Edit</button>
+      <strong>${task.title}</strong><br>
+      <em>👤 ${task.name}</em><br>
+      <p>${task.description}</p>
+      <span>⏰ ${task.timestamp?.toDate().toLocaleString() || 'Just now'}</span><br>
+      <span>🚦 Priority: ${task.priority}</span>
+      <button class="deleteBtn" onclick="deleteTask('${docSnap.id}')">Delete</button>
     `;
     taskList.appendChild(li);
   });
-}
-
-function deleteTask(index) {
-  if (confirm('Are you sure you want to delete this task?')) {
-    tasks.splice(index, 1);
-    saveTasks();
-    renderTasks();
-  }
-}
-
-function editTask(index) {
-  const task = tasks[index];
-  document.getElementById('taskName').value = task.name;
-  document.getElementById('taskTitle').value = task.title;
-  document.getElementById('taskDescription').value = task.description;
-  document.getElementById('taskPriority').value = task.priority;
-  tasks.splice(index, 1);
-  saveTasks();
-  renderTasks();
-}
-
-taskForm.addEventListener('submit', function (e) {
-  e.preventDefault();
-  const name = document.getElementById('taskName').value.trim();
-  const title = document.getElementById('taskTitle').value.trim();
-  const description = document.getElementById('taskDescription').value.trim();
-  const priority = document.getElementById('taskPriority').value;
-  const timestamp = new Date().toLocaleString();
-
-  if (name && title && description) {
-    const newTask = { name, title, description, priority, timestamp };
-    tasks.push(newTask);
-    saveTasks();
-    taskForm.reset();
-    renderTasks();
-  }
 });
 
-searchInput.addEventListener('input', () => {
-  const keyword = searchInput.value.toLowerCase();
-  const filtered = tasks.filter(task =>
-    task.title.toLowerCase().includes(keyword) ||
-    task.description.toLowerCase().includes(keyword) ||
-    task.name.toLowerCase().includes(keyword)
-  );
-  renderTasks(filtered);
-});
-
-darkModeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
-
-renderTasks();
-```
-    }
-  ]
-}
+// Delete function (attached to global scope)
+window.deleteTask = async function(id) {
+  await deleteDoc(doc(db, "tasks", id));
+};
