@@ -1,34 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF‑8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Task Manager</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="wrapper">
-    <div class="task-container">
-      <h1 class="app-title">📋 Task Manager</h1>
+  <div class="task-container">
+    <h1 class="app-title">📋 Task Manager</h1>
 
-      <form id="taskForm" class="task-form">
-        <input type="text" id="name" placeholder="Your Name" required />
-        <input type="text" id="taskTitle" placeholder="Task Title" required />
-        <textarea id="taskDescription" placeholder="Task Description" required></textarea>
+    <form id="taskForm" class="task-form">
+      <div class="form-row">
+        <input type="text" id="userName" placeholder="Your Name" required />
+        <select id="taskPriority">
+          <option value="Low" selected>🟢 Low</option>
+          <option value="Medium">🟠 Medium</option>
+          <option value="High">🔴 High</option>
+        </select>
+      </div>
+      <input type="text" id="taskTitle" placeholder="Task Title" required />
+      <textarea id="taskDescription" placeholder="Task Description" required></textarea>
+      <div class="form-row">
+        <select id="taskStatus">
+          <option value="Pending" selected>Pending</option>
+          <option value="Done">Done</option>
+        </select>
         <button type="submit">➕ Add Task</button>
-      </form>
+      </div>
+    </form>
 
-      <h2 class="task-heading">Team Tasks</h2>
-      <ul id="taskList" class="task-list"></ul>
-    </div>
+    <h2 class="task-heading">Team Tasks</h2>
+    <ul id="taskList" class="task-list"></ul>
+    
+    <footer class="footer">Created by Palani</footer>
   </div>
 
-  <footer>
-    <p>Created by Palani</p>
-  </footer>
-
-  <!-- Firebase + Script -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
