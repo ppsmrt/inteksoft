@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Task Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Team Follow-Up Task Manager</h1>
+
+    <form id="taskForm">
+      <input type="text" id="taskTitle" placeholder="Task Title" required />
+      <textarea id="taskDescription" placeholder="Task Description" required></textarea>
+      <select id="assignedBy">
+        <option value="Member 1">Member 1</option>
+        <option value="Member 2">Member 2</option>
+        <option value="Member 3">Member 3</option>
+        <option value="Member 4">Member 4</option>
+      </select>
+      <button type="submit">Add Task</button>
+    </form>
+
+    <h2>All Tasks</h2>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
