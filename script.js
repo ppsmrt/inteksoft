@@ -4,6 +4,7 @@ import {
   onSnapshot, doc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAOdDEfI5_LA9wtk8WAdSq3XBn-ppoUHvY",
   authDomain: "tasks-web-app-new.firebaseapp.com",
@@ -16,25 +17,26 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const taskCol = collection(db, "tasks");
+const tasksCol = collection(db, "tasks");
 
 const taskForm = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
-
 let editId = null;
 
-onSnapshot(taskCol, snapshot => {
+onSnapshot(tasksCol, snapshot => {
   taskList.innerHTML = "";
   snapshot.forEach(docSnap => {
     const t = docSnap.data();
-    const li = document.createElement("li");
-    li.dataset.priority = t.priority;
+    const li = document.createElement("div");
+    li.className = "task-card";
     li.innerHTML = `
-      <strong>${t.name}</strong>
-      <div class="task-details"><b>${t.title}</b><br>${t.description}</div>
+      <div class="task-title">${t.title}</div>
+      <div class="task-desc">${t.description}</div>
       <div class="task-meta">${new Date(t.created.toMillis()).toLocaleString()} • ${t.status}</div>
-      <button class="editBtn" onclick="startEdit('${docSnap.id}', '${t.name}', '${t.title}', '${t.description}', '${t.priority}', '${t.status}')">Edit</button>
+      <div class="task-priority" priority="${t.priority}"></div>
+      <button class="editBtn" onclick="startEdit('${docSnap.id}', '${t.title}', '${t.description}', '${t.priority}', '${t.status}')">Edit</button>
       <button class="deleteBtn" onclick="deleteTask('${docSnap.id}')">✖</button>
+      <button class="statusBtn" onclick="toggleStatus('${docSnap.id}', '${t.status}')">${t.status}</button>
     `;
     taskList.appendChild(li);
   });
@@ -42,35 +44,43 @@ onSnapshot(taskCol, snapshot => {
 
 taskForm.addEventListener("submit", async e => {
   e.preventDefault();
-  const name = document.getElementById("userName").value.trim();
   const title = document.getElementById("taskTitle").value.trim();
   const description = document.getElementById("taskDescription").value.trim();
-  const priority = document.getElementById("taskPriority").value;
-  const status = document.getElementById("taskStatus").value;
+  const priority = document.querySelector('input[name="priority"]:checked').value;
+  const status = editId ? null : "Pending";
 
-  if (!name || !title || !description) return;
-  const data = { name, title, description, priority, status, created: serverTimestamp() };
+  if (!title || !description) return;
+
+  const data = {
+    title, description, priority,
+    ...(editId ? {} : { status }),
+    created: serverTimestamp()
+  };
 
   if (editId) {
-    await updateDoc(doc(db, "tasks", editId), data);
+    await updateDoc(doc(tasksCol, editId), data);
     editId = null;
-    taskForm.reset();
   } else {
-    await addDoc(taskCol, data);
+    await addDoc(tasksCol, data);
   }
+
+  taskForm.reset();
 });
 
 window.deleteTask = async id => {
   if (confirm("Delete this task?")) {
-    await deleteDoc(doc(db, "tasks", id));
+    await deleteDoc(doc(tasksCol, id));
   }
 };
 
-window.startEdit = (id, name, title, desc, priority, status) => {
+window.startEdit = (id, title, desc, priority, status) => {
   editId = id;
-  document.getElementById("userName").value = name;
   document.getElementById("taskTitle").value = title;
   document.getElementById("taskDescription").value = desc;
-  document.getElementById("taskPriority").value = priority;
-  document.getElementById("taskStatus").value = status;
+  document.querySelector(`input[name="priority"][value="${priority}"]`).checked = true;
+};
+
+window.toggleStatus = async (id, current) => {
+  const newStatus = current === "Pending" ? "Done" : "Pending";
+  await updateDoc(doc(tasksCol, id), { status: newStatus });
 };
