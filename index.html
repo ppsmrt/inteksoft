@@ -1,35 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="auto">
 <head>
-  <meta charset="UTF‑8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Task Manager</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Auto theme detection -->
+  <script>
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  </script>
 </head>
 <body>
-  <div class="container">
-    <h1 class="app-title">📋 Task Manager</h1>
+  <div class="wrapper">
+    <div class="task-container">
+      <h1 class="app-title">📋 Task Manager</h1>
 
-    <form id="taskForm" class="task-form">
-      <input type="text" id="taskTitle" placeholder="Task Title" required />
-      <textarea id="taskDescription" placeholder="Task Description" required></textarea>
-      <div class="form-group">
-        <label>Priority</label>
-        <div class="radio-group">
-          <label><input type="radio" name="priority" value="Low" checked>Low</label>
-          <label><input type="radio" name="priority" value="Medium">Medium</label>
-          <label><input type="radio" name="priority" value="High">High</label>
-        </div>
-      </div>
-      <button type="submit" class="fab">➕ Add Task</button>
-    </form>
+      <form id="taskForm" class="task-form">
+        <input type="text" id="taskName" placeholder="Your Name" required />
+        <input type="text" id="taskTitle" placeholder="Task Title" required />
+        <textarea id="taskDescription" placeholder="Task Description" required></textarea>
+        <select id="taskPriority" required>
+          <option value="" disabled selected>Priority Level</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <button type="submit">➕ Add Task</button>
+      </form>
 
-    <h2 class="task-heading">Tasks</h2>
-    <div id="taskList" class="task-list"></div>
-    <footer>Created by Palani</footer>
+      <h2 class="task-heading">Your Tasks</h2>
+      <ul id="taskList" class="task-list"></ul>
+    </div>
   </div>
 
-  <script type="module" src="script.js"></script>
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Created with ❤️ by <strong>Palani</strong></p>
+  </footer>
+
+  <!-- Firebase Config (use your own script or CDN link if modular) -->
+  <script type="module" src="firebase-config.js"></script>
+
+  <!-- App Logic -->
+  <script src="script.js"></script>
 </body>
 </html>
