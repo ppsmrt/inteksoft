@@ -4,22 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Secure Task Manager</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Login Form -->
   <div class="container" id="loginContainer">
     <h1>Login</h1>
     <form id="loginForm" autocomplete="on">
-      <input type="text" id="username" placeholder="Username" required autocomplete="username" />
-      <input type="password" id="password" placeholder="Password" required autocomplete="current-password" />
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Username"
+        required
+        autocomplete="username"
+      />
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Password"
+        required
+        autocomplete="current-password"
+      />
       <button type="submit">Login</button>
     </form>
   </div>
 
+  <!-- Main Task Manager Interface -->
   <div class="container" id="taskContainer" style="display:none;">
     <h1>Team Task Manager</h1>
     <p>Welcome, <strong id="currentUser"></strong></p>
 
+    <!-- Task Entry Form -->
     <form id="taskForm">
       <input type="text" id="taskTitle" placeholder="Task Title" required />
       <textarea id="taskDescription" placeholder="Task Description" required></textarea>
@@ -29,6 +46,7 @@
     <h2>All Tasks</h2>
     <ul id="taskList"></ul>
 
+    <!-- Admin Panel (Only visible to admin) -->
     <div id="adminPanel" style="display:none;">
       <h2>Admin Panel: Manage Users</h2>
       <ul id="userList"></ul>
@@ -37,6 +55,7 @@
     <button id="logoutBtn">Logout</button>
   </div>
 
+  <!-- Load main JavaScript -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
