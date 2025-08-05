@@ -4,7 +4,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team Task Manager</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, textarea, select {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #eee;
+      margin: 10px 0;
+      padding: 10px;
+      border-left: 5px solid #007bff;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -26,6 +80,43 @@
     <ul id="taskList"></ul>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    document.getElementById('taskForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('taskTitle').value.trim();
+      const description = document.getElementById('taskDescription').value.trim();
+      const assignedBy = document.getElementById('assignedBy').value;
+
+      const task = {
+        id: Date.now(),
+        title,
+        description,
+        assignedBy
+      };
+
+      let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.push(task);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+
+      this.reset();
+      renderTasks();
+    });
+
+    function renderTasks() {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${task.title}</strong><br>${task.description}<br><em>Assigned By: ${task.assignedBy}</em>`;
+        taskList.appendChild(li);
+      });
+    }
+
+    renderTasks();
+  </script>
 </body>
 </html>
