@@ -8,37 +8,32 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="theme-toggle">
+    <label class="switch">
+      <input type="checkbox" id="themeToggle" />
+      <span class="slider round"></span>
+    </label>
+  </div>
+
   <div class="wrapper">
     <div class="task-container">
       <h1 class="app-title">📋 Task Manager</h1>
-
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeToggle">
-        <span>🌗 Toggle Dark Mode</span>
-      </label>
-
       <form id="taskForm" class="task-form">
         <input type="text" id="taskName" placeholder="Your Name" required />
         <input type="text" id="taskTitle" placeholder="Task Title" required />
         <textarea id="taskDescription" placeholder="Task Description" required></textarea>
-        <select id="taskPriority">
-          <option value="Low">🟢 Low</option>
-          <option value="Medium">🟠 Medium</option>
-          <option value="High">🔴 High</option>
-        </select>
         <button type="submit">➕ Add Task</button>
       </form>
 
       <h2 class="task-heading">Your Tasks</h2>
       <ul id="taskList" class="task-list"></ul>
-
-      <footer>
-        <p>Created by Palani</p>
-      </footer>
     </div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script type="module" src="script.js"></script>
+  <footer class="footer">
+    Created by Palani
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
