@@ -5,20 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
   <title>Premium Links Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    /* Fullscreen iframe overlay */
+    #iframeOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+    }
+    #iframeOverlay iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+    #iframeOverlay .closeBtn {
+      background: #f3f4f6;
+      border-bottom: 1px solid #d1d5db;
+      padding: 1rem;
+      text-align: right;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex flex-col">
 
   <!-- Top Navigation -->
   <header class="w-full bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm fixed top-0 left-0 z-10">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Logo -->
       <div class="flex items-center gap-2 text-gray-800 font-bold text-lg">
         <i class="fas fa-layer-group text-green-600"></i>
         <span>Dashboard</span>
       </div>
-      <!-- Profile -->
       <div class="flex items-center gap-2 text-gray-700 font-medium">
         <i class="fas fa-user-circle text-xl text-gray-600"></i>
         <span>Admin</span>
@@ -27,53 +51,81 @@
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 flex items-center justify-center px-4 mt-20">
-    <div class="w-full max-w-md space-y-5">
-      <!-- Header -->
-      <div class="text-center mb-6">
-        <h1 class="text-3xl font-extrabold text-gray-900">🌐 Admin</h1>
-        <p class="text-gray-500 text-sm sm:text-base font-medium">Access websites of Inteksoft in one page</p>
-      </div>
+  <main class="flex-1 flex flex-col items-center justify-start px-4 mt-20 mb-6 space-y-5 w-full max-w-md mx-auto">
+    <div class="text-center mb-4">
+      <h1 class="text-3xl font-extrabold text-gray-900">🌐 Admin</h1>
+      <p class="text-gray-500 text-sm sm:text-base font-medium">Access websites of Inteksoft in one page</p>
+    </div>
 
-      <!-- Links -->
-      <a href="https://tnm3u.live/admin" target="_blank"
-        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg">
+    <!-- Links -->
+    <div class="space-y-3 w-full">
+      <button onclick="openFullscreen('https://tnm3u.live/admin')"
+        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg w-full">
         <span><i class="fas fa-tv mr-2 text-blue-500"></i> Add TV Channel</span>
         <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
-      </a>
+      </button>
 
-      <a href="https://tnm3u.live/approve" target="_blank"
-        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg">
-        <span><i class="fas fa-play mr-2 text-red-500"></i> Approve Tv Channel</span>
+      <button onclick="openFullscreen('https://tnm3u.live/approve')"
+        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg w-full">
+        <span><i class="fas fa-play mr-2 text-red-500"></i> Approve TV Channel</span>
         <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
-      </a>
+      </button>
 
-      <a href="https://tnm3u.live/fm/admin" target="_blank"
-        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg">
+      <button onclick="openFullscreen('https://tnm3u.live/fm/admin')"
+        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg w-full">
         <span><i class="fas fa-radio mr-2 text-orange-800"></i> Add Radio Channel</span>
         <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
-      </a>
+      </button>
 
-      <a href="https://www.tnm3u.live/upload" target="_blank"
-        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg">
+      <button onclick="openFullscreen('https://www.tnm3u.live/upload')"
+        class="flex items-center justify-between backdrop-blur-md bg-white/70 border border-gray-200 text-gray-900 font-medium px-5 py-4 rounded-xl shadow-md transition transform hover:scale-105 hover:shadow-lg w-full">
         <span><i class="fas fa-upload mr-2 text-green-600"></i> Upload Image</span>
         <i class="fas fa-arrow-up-right-from-square text-gray-400"></i>
-      </a>
+      </button>
     </div>
   </main>
 
-  
-    <!-- Bottom Bar -->
-    <div class="border-t border-gray-200 mt-6">
-      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-500">
-        <p>© 2025 CorpDash. All rights reserved.</p>
-        <p class="flex items-center gap-1">
-          <i class="fas fa-shield-alt text-green-600"></i>
-          Secured & Trusted
-        </p>
-      </div>
+  <!-- Fullscreen Iframe Overlay -->
+  <div id="iframeOverlay" class="flex">
+    <div class="closeBtn" onclick="closeFullscreen()"><i class="fas fa-arrow-left mr-2"></i> Back</div>
+    <iframe id="fullscreenFrame" src=""></iframe>
+  </div>
+
+  <!-- Bottom Bar -->
+  <footer class="border-t border-gray-200 mt-6 w-full">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-500">
+      <p>© 2025 CorpDash. All rights reserved.</p>
+      <p class="flex items-center gap-1">
+        <i class="fas fa-shield-alt text-green-600"></i>
+        Secured & Trusted
+      </p>
     </div>
   </footer>
+
+  <script>
+    const overlay = document.getElementById('iframeOverlay');
+    const frame = document.getElementById('fullscreenFrame');
+
+    function openFullscreen(url) {
+      frame.src = url;
+      overlay.style.display = 'flex';
+      history.pushState({iframeOpen: true}, "Iframe Open"); // Add history entry
+    }
+
+    function closeFullscreen() {
+      frame.src = '';
+      overlay.style.display = 'none';
+      // Remove the history entry when overlay closes
+      if (history.state && history.state.iframeOpen) history.back();
+    }
+
+    // Handle device back button
+    window.addEventListener('popstate', function(event) {
+      if (overlay.style.display === 'flex') {
+        closeFullscreen();
+      }
+    });
+  </script>
 
 </body>
 </html>
