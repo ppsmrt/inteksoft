@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JIOTV+</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent:#06b6d4;
+      --accent-2:#10b981;
+      --bg:#071029;
+      --card:#0f1724;
+      --muted:#9aa6bf;
+      --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(0,0,0,0.05);
+      --glass-overlay: rgba(255,255,255,0.02);
+      --radius:12px;
+      --nav-width:280px;
+      --max-width:1200px;
+      --text:#e6eef8;
+      --btn-shadow: 0 6px 18px rgba(2,6,23,0.45);
+      color-scheme: dark;
+    }
+
+    /* Light theme */
+    body.light{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#556;
+      --glass: rgba(0,0,0,0.04);
+      --glass-2: rgba(0,0,0,0.06);
+      --glass-overlay: rgba(0,0,0,0.04);
+      --text:#0b1220;
+      --btn-shadow: 0 8px 22px rgba(2,6,23,0.06);
+      color-scheme: light;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;padding:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+    img{display:block;max-width:100%;height:auto}
+
+    /* Topbar */
+    .topbar{
+      width:100%;
+      position:sticky;
+      top:0;
+      z-index:1000;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, var(--glass-overlay), transparent);
+      border-bottom:1px solid rgba(255,255,255,0.03);
+    }
+    .topbar .container{
+      max-width:var(--max-width);
+      margin:0 auto;
+      padding:10px 18px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Gloock,serif;color:#012}
+    .brand h1{font-size:18px;margin:0;letter-spacing:1px}
+
+    /* Search */
+    .search{flex:1;display:flex;align-items:center;padding:6px;background:var(--glass);border-radius:999px;border:1px solid rgba(255,255,255,0.03);min-width:200px}
+    .search input{border:0;background:transparent;color:inherit;padding:10px 12px;font-size:14px;width:100%;outline:none}
+    .search .icon{padding:8px;opacity:0.85}
+
+    /* Top actions */
+    .top-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+    .icon-btn{
+      background:var(--glass);
+      border:0;
+      padding:9px;
+      border-radius:10px;
+      cursor:pointer;
+      color:inherit;
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:40px;
+      min-height:40px;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      box-shadow: var(--btn-shadow);
+    }
+    .icon-btn:active{transform:translateY(1px)}
+    .icon-btn:focus{outline:2px solid rgba(0,0,0,0.08);outline-offset:2px}
+
+    /* layout */
+    .page{
+      min-height:calc(100vh - 64px);
+      display:flex;
+      justify-content:center;
+      padding:18px;
+      width:100%;
+    }
+    .shell{
+      width:100%;
+      max-width:var(--max-width);
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+    }
+
+    /* sidebar (hidden by default; appears when '.visible') */
+    .sidebar {
+      width:var(--nav-width);
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:14px;
+      flex-shrink:0;
+      height:calc(100vh - 140px);
+      overflow:auto;
+      transform:translateX(-120%);
+      transition: transform .28s cubic-bezier(.22,.9,.3,1), box-shadow .18s ease, opacity .18s ease;
+      will-change:transform;
+      position:fixed;
+      left:18px;
+      top:84px;
+      bottom:18px;
+      z-index:1200;
+      box-shadow: 0 30px 80px rgba(2,6,23,0.6);
+      opacity:0;
+      pointer-events:none;
+    }
+    .sidebar.visible { transform:translateX(0); opacity:1; pointer-events:auto }
+
+    /* when user requests larger static sidebar on very wide screens, use .pinned (optional) */
+    .sidebar.pinned{
+      position:relative;
+      transform:none;
+      opacity:1;
+      pointer-events:auto;
+      left:0; top:0; bottom:auto; height:auto; box-shadow: none;
+    }
+
+    /* overlay */
+    .overlay {
+      position:fixed;
+      inset:0;
+      z-index:1100;
+      background:rgba(0,0,0,0.45);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .overlay.show { opacity:1; pointer-events:auto }
+
+    .nav-section{margin-bottom:18px}
+    .nav-section h3{margin:0 0 8px 0;font-size:13px;color:var(--muted);font-weight:600}
+    .nav-list{display:flex;flex-direction:column;gap:8px}
+    .nav-item{
+      display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;text-decoration:none;color:inherit;background:transparent;border:1px solid transparent;cursor:pointer;font-size:14px;
+    }
+    .nav-item:hover{background:rgba(255,255,255,0.02)}
+    .nav-item.active{background:linear-gradient(90deg, rgba(255,255,255,0.03), transparent);border-color:rgba(255,255,255,0.03)}
+
+    /* custom select and arrow */
+    .select{
+      padding:8px 10px;border-radius:8px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);color:var(--text);
+      -webkit-appearance:none;appearance:none;position:relative;min-width:120px;
+    }
+    /* ensure options visible in both modes */
+    .select option { color: var(--text); background: var(--card); }
+    .select-wrap{position:relative;display:inline-block}
+    .select-wrap:after{
+      content: '▾';
+      font-family: inherit;
+      font-weight:700;
+      position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);
+      font-size:13px;
+    }
+
+    /* content */
+    .content{flex:1;min-height:200px}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      padding:8px 12px;border-radius:999px;background:var(--glass);cursor:pointer;font-size:13px;border:0;color:inherit;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: var(--btn-shadow);
+    }
+    .chip:focus{outline:2px solid rgba(0,0,0,0.06);outline-offset:2px}
+    .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 10px 30px rgba(2,6,23,0.2);color:#012}
+
+    /* grid */
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      align-items:start;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--glass-overlay), transparent);
+      padding:14px;border-radius:12px;text-align:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.03);
+      transition:transform .15s ease, box-shadow .15s ease, background .12s ease;
+    }
+    .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.45)}
+    .card a.card-link{display:block;color:inherit;text-decoration:none;padding:0;margin:0}
+    .card img{width:80px;height:80px;border-radius:50%;object-fit:contain;background:rgba(255,255,255,0.02);display:block;margin:0 auto 8px}
+    .card h4{margin:0;font-size:14px;line-height:1.15}
+    .card p{margin:6px 0 0 0;font-size:12px;color:var(--muted);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+    .card .fav{position:absolute;right:10px;top:10px;background:transparent;border:0;font-size:17px;cursor:pointer;z-index:2}
+    .card .fav i{transition:transform .12s ease}
+    .card .fav:active i{transform:scale(.95)}
+
+    /* footer CTA */
+    .footer-cta{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:12px;background:linear-gradient(90deg, var(--glass-overlay), transparent);margin-top:18px;box-shadow:var(--btn-shadow)}
+
+    /* drawer (favorites/recent) */
+    .drawer{position:fixed;right:18px;bottom:18px;background:var(--card);padding:12px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.6);max-width:420px;min-width:260px;z-index:1400}
+
+    /* responsive layout changes */
+    @media (max-width:1000px){
+      .shell{padding:0 12px}
+      .page{padding:12px 0}
+    }
+
+    /* MOBILE: 3 cards per row */
+    @media (max-width:700px){
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .brand h1{display:none}
+      .search{display:none}
+      .topbar .container{justify-content:space-between}
+      .shell{flex-direction:column;gap:12px}
+      .drawer{left:12px;right:12px}
+      .top-actions .chip{display:none}
+      .sidebar { left:12px; top:72px; bottom:12px; width:calc(100% - 24px); border-radius:12px; }
+    }
+
+    @media (max-width:420px){
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .card img{width:64px;height:64px}
+    }
+
+    /* helpers */
+    .muted{color:var(--muted);font-size:13px}
+    a{color:inherit}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <!-- TOPBAR -->
+  <header class="topbar" role="banner">
+    <div class="container">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button id="mobileMenuBtn" class="icon-btn" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+        <div class="brand">
+          <div class="logo">8y</div>
+          <h1>JIOTV+</h1>
+        </div>
+      </div>
+
+      <div class="search" role="search" aria-label="Site search">
+        <span class="icon"><i class="fas fa-search"></i></span>
+        <input id="searchTop" type="search" placeholder="Search channels, genres..." aria-label="Search channels" />
+        <button id="clearSearch" class="icon-btn" title="Clear search" style="display:none"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="top-actions" role="toolbar" aria-label="Top actions">
+        <div class="select-wrap">
+          <select id="languageSelect" class="select" aria-label="Filter by language">
+            <option value="all">All Languages</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="ta">Tamil</option>
+          </select>
+        </div>
+
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle theme"><i class="fas fa-sun"></i></button>
+        <button id="favoritesBtn" class="icon-btn" aria-label="Favorites"><i class="fas fa-heart"></i></button>
+        <button id="recentBtn" class="icon-btn" aria-label="Recently watched"><i class="fas fa-history"></i></button>
+        <a id="telegramJoin" class="icon-btn" href="https://t.me/your_telegram_channel" target="_blank" rel="noopener" aria-label="Join Telegram"><i class="fab fa-telegram-plane"></i></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- overlay for off-canvas -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- MAIN PAGE -->
+  <main class="page" role="main">
+    <div class="shell" role="application">
+
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="sidebar" aria-label="Main navigation" aria-hidden="true">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button id="closeSidebarBtn" class="icon-btn" aria-label="Close sidebar"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="nav-section">
+          <h3>Browse</h3>
+          <div class="nav-list" id="categoryList">
+            <div class="nav-item active" data-cat="All"><i class="fas fa-th-large"></i> All</div>
+            <div class="nav-item" data-cat="Favorites"><i class="fas fa-heart"></i> Favorites</div>
+            <!-- "Live" removed as requested -->
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <h3>Telegram</h3>
+          <div class="muted">Get updates, links & support</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <a class="chip" href="https://t.me/your_telegram_channel" target="_blank" rel="noopener">Join Channel</a>
+            <a class="chip" href="https://t.me/your_telegram_group" target="_blank" rel="noopener">Join Group</a>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <h3>About</h3>
+          <div class="muted" style="font-size:13px">JIOTV+ — community curated channel directory. Tap a card to open player.</div>
+        </div>
+      </aside>
+
+      <!-- CONTENT -->
+      <section class="content" aria-live="polite">
+        <div class="toolbar">
+          <div class="chips" id="chips"></div>
+          <div class="muted" id="resultCount">—</div>
+        </div>
+
+        <div id="tvGrid" class="grid" role="list"></div>
+
+        <div class="footer-cta">
+          <div>
+            <strong>Join our Telegram</strong>
+            <div class="muted">Get latest channel updates and links</div>
+          </div>
+          <div>
+            <a class="chip" href="https://t.me/your_telegram_channel" target="_blank" rel="noopener">Join on Telegram <i class="fab fa-telegram-plane" style="margin-left:6px"></i></a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- drawer (favorites / recent) -->
+  <div id="drawer" class="drawer" style="display:none" role="dialog" aria-modal="true">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <strong id="drawerTitle">Drawer</strong>
+      <button id="closeDrawer" class="icon-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="drawerContent"></div>
+  </div>
+
+  <script>
+    /* ----------------------------
+       Config + element refs
+       ---------------------------- */
+    const API = './api.json';
+    const tvGrid = document.getElementById('tvGrid');
+    const chipsEl = document.getElementById('chips');
+    const categoryList = document.getElementById('categoryList');
+    const resultCount = document.getElementById('resultCount');
+
+    const searchTop = document.getElementById('searchTop');
+    const clearSearch = document.getElementById('clearSearch');
+    const favoritesBtn = document.getElementById('favoritesBtn');
+    const recentBtn = document.getElementById('recentBtn');
+    const drawer = document.getElementById('drawer');
+    const drawerContent = document.getElementById('drawerContent');
+    const drawerTitle = document.getElementById('drawerTitle');
+    const closeDrawer = document.getElementById('closeDrawer');
+
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const themeToggle = document.getElementById('themeToggle');
+    const languageSelect = document.getElementById('languageSelect');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    let channels = [];
+    let filtered = [];
+    let favorites = [];
+    let recentlyWatched = [];
+    let selectedCategory = 'All';
+    let selectedLanguage = 'all';
+
+    /* ----------------------------
+       Utilities - storage + helpers
+       ---------------------------- */
+    function loadState(){
+      try{
+        favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        recentlyWatched = JSON.parse(localStorage.getItem('recentlyWatched')) || [];
+        const lastTheme = localStorage.getItem('theme');
+        if(lastTheme === 'light') document.body.classList.add('light');
+      }catch(e){
+        console.warn('localStorage error', e);
+        favorites = favorites || [];
+        recentlyWatched = recentlyWatched || [];
+      }
+    }
+    function saveFavorites(){ localStorage.setItem('favorites', JSON.stringify(favorites)); }
+    function saveRecentlyWatched(){ localStorage.setItem('recentlyWatched', JSON.stringify(recentlyWatched)); }
+
+    function setThemeIcon(){
+      const isLight = document.body.classList.contains('light');
+      themeToggle.innerHTML = isLight ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+    }
+
+    loadState();
+    setThemeIcon();
+
+    /* ----------------------------
+       Theme / mobile menu / overlay
+       ---------------------------- */
+    themeToggle.addEventListener('click', ()=>{
+      document.body.classList.toggle('light');
+      localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+      setThemeIcon();
+      // ensure select/option colors update in some browsers
+      document.querySelectorAll('.select, .select option').forEach(el=>{
+        el.style.color = getComputedStyle(document.body).getPropertyValue('--text').trim();
+        el.style.background = getComputedStyle(document.body).getPropertyValue('--card').trim();
+      });
+    });
+
+    function openSidebar(){
+      sidebar.classList.add('visible');
+      overlay.classList.add('show');
+      sidebar.setAttribute('aria-hidden','false');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar(){
+      sidebar.classList.remove('visible');
+      overlay.classList.remove('show');
+      sidebar.setAttribute('aria-hidden','true');
+      overlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    // Toggle via button; on desktop it also opens/closes sidebar so user can control it explicitly
+    mobileMenuBtn.addEventListener('click', ()=>{
+      if(sidebar.classList.contains('visible')) closeSidebar();
+      else openSidebar();
+    });
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+
+    overlay.addEventListener('click', ()=>{
+      closeSidebar();
+      closeDrawerFn();
+    });
+
+    // keep sidebar hidden by default (user requested hidden until click). We won't auto-show on resize.
+    function adaptSidebarOnResize(){
+      // Keep behavior consistent: sidebar stays hidden until user toggles it.
+      // If you want a pinned desktop sidebar, add .pinned to #sidebar via code/css.
+      if(window.innerWidth > 1400){
+        // optional: auto-pin on very wide screens if desired (commented out)
+        // sidebar.classList.add('pinned');
+      }else{
+        sidebar.classList.remove('pinned');
+      }
+    }
+    window.addEventListener('resize', adaptSidebarOnResize);
+    adaptSidebarOnResize();
+
+    /* ----------------------------
+       Drawer (favorites / recent)
+       ---------------------------- */
+    function openDrawer(title, html){
+      drawerTitle.textContent = title;
+      drawerContent.innerHTML = html || '<div class="muted">No items</div>';
+      drawer.style.display = 'block';
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawerFn(){
+      drawer.style.display = 'none';
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    closeDrawer.addEventListener('click', closeDrawerFn);
+
+    favoritesBtn.addEventListener('click', ()=>{
+      const html = favorites.length
+        ? favorites.slice().reverse().map(id=>{
+            const ch = channels.find(c=>c.channel_id === id);
+            if(!ch) return '';
+            return `<div style="display:flex;gap:10px;align-items:center;padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)">
+              <img src="${ch.channel_logo}" width="44" height="44" style="border-radius:8px;object-fit:contain"/>
+              <div style="flex:1"><strong>${escapeHtml(ch.channel_name)}</strong><div class="muted">${escapeHtml(ch.channel_genre)} • ${escapeHtml(ch.channel_language || '—')}</div></div>
+              <a href="jioplayer.html?id=${encodeURIComponent(ch.channel_id)}" class="chip" style="text-decoration:none">Open</a>
+            </div>`;
+          }).join('')
+        : '<div class="muted">No favorites yet. Tap the heart on a card to save it.</div>';
+      openDrawer('Favorites', html);
+    });
+
+    recentBtn.addEventListener('click', ()=>{
+      const html = recentlyWatched.length
+        ? recentlyWatched.slice().map(entry=>{
+            const ch = channels.find(c=>c.channel_id === entry.id) || {channel_name:entry.name, channel_logo:entry.logo, channel_genre:entry.genre};
+            return `<div style="display:flex;gap:10px;align-items:center;padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)">
+              <img src="${ch.channel_logo}" width="44" height="44" style="border-radius:8px;object-fit:contain"/>
+              <div style="flex:1"><strong>${escapeHtml(ch.channel_name)}</strong><div class="muted">${escapeHtml(entry.at)}</div></div>
+              <a href="jioplayer.html?id=${encodeURIComponent(ch.channel_id || entry.id)}" class="chip" style="text-decoration:none">Open</a>
+            </div>`;
+          }).join('')
+        : '<div class="muted">You haven\'t watched any channels yet.</div>';
+      openDrawer('Recently watched', html);
+    });
+
+    /* ----------------------------
+       Search + filtering
+       ---------------------------- */
+    function handleSearchInput(){
+      const q = (searchTop.value || '').trim();
+      clearSearch.style.display = q ? 'inline-block' : 'none';
+      renderGrid(selectedCategory, q);
+    }
+    searchTop.addEventListener('input', handleSearchInput);
+    clearSearch.addEventListener('click', ()=>{ searchTop.value = ''; handleSearchInput(); });
+
+    // category list clicks
+    categoryList.addEventListener('click', (e)=>{
+      const el = e.target.closest('.nav-item');
+      if(!el) return;
+      categoryList.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      el.classList.add('active');
+      selectedCategory = el.dataset.cat || 'All';
+      renderGrid(selectedCategory, searchTop.value);
+      // close sidebar when a selection occurs on narrow screens or if user wants it hidden after selection
+      if(window.innerWidth < 1000) closeSidebar();
+      else closeSidebar(); // hide after click on desktop too per your request
+    });
+
+    /* ----------------------------
+       Favorites / recently watched
+       ---------------------------- */
+    function toggleFavorite(id){
+      const i = favorites.indexOf(id);
+      if(i > -1) favorites.splice(i,1);
+      else favorites.push(id);
+      saveFavorites();
+      renderGrid(selectedCategory, searchTop.value);
+    }
+
+    function addRecentlyWatched(ch){
+      const entry = { id: ch.channel_id, name: ch.channel_name, logo: ch.channel_logo, genre: ch.channel_genre, at: new Date().toLocaleString() };
+      recentlyWatched = recentlyWatched.filter(r=>r.id !== entry.id);
+      recentlyWatched.unshift(entry);
+      if(recentlyWatched.length > 20) recentlyWatched.pop();
+      saveRecentlyWatched();
+    }
+
+    /* ----------------------------
+       Render grid & filters
+       ---------------------------- */
+    function renderGrid(category='All', q=''){
+      const term = q && q.toLowerCase();
+      if(category === 'Favorites') filtered = channels.filter(c=>favorites.includes(c.channel_id));
+      else if(category === 'All') filtered = channels.slice();
+      else filtered = channels.filter(c=>c.channel_genre === category);
+
+      if(selectedLanguage && selectedLanguage !== 'all'){
+        filtered = filtered.filter(c => (c.channel_language || '').toLowerCase() === (selectedLanguage || '').toLowerCase());
+      }
+      if(term) filtered = filtered.filter(c => (c.channel_name||'').toLowerCase().includes(term) || (c.channel_genre||'').toLowerCase().includes(term));
+
+      tvGrid.innerHTML = '';
+      if(filtered.length === 0){
+        tvGrid.innerHTML = '<div class="muted" style="grid-column:1/-1;text-align:center;padding:40px">No channels found.</div>';
+        resultCount.textContent = '0 results';
+        return;
+      }
+
+      resultCount.textContent = filtered.length + ' results';
+
+      const frag = document.createDocumentFragment();
+      filtered.forEach(ch=>{
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.setAttribute('role','listitem');
+
+        // clickable card anchor
+        const link = document.createElement('a');
+        link.className = 'card-link';
+        link.href = `jioplayer.html?id=${encodeURIComponent(ch.channel_id)}`;
+        link.setAttribute('data-id', ch.channel_id);
+        link.addEventListener('click', (ev)=>{ addRecentlyWatched(ch); sessionStorage.setItem('scrollPos', window.scrollY); });
+
+        link.innerHTML = `
+          <img src="${escapeHtml(ch.channel_logo || 'https://via.placeholder.com/120?text=No+Logo')}" alt="${escapeHtml(ch.channel_name)} logo" loading="lazy">
+          <h4>${escapeHtml(ch.channel_name)}</h4>
+          <p>${escapeHtml(ch.channel_genre)} • ${escapeHtml(ch.channel_language || '—')}</p>
+        `;
+
+        const favBtn = document.createElement('button');
+        favBtn.className = 'fav';
+        favBtn.setAttribute('aria-label', 'Toggle favorite');
+        favBtn.innerHTML = favorites.includes(ch.channel_id) ? '<i class="fas fa-heart" style="color:#ff6b81"></i>' : '<i class="far fa-heart"></i>';
+        favBtn.addEventListener('click', (ev)=>{ ev.preventDefault(); ev.stopPropagation(); toggleFavorite(ch.channel_id); });
+
+        card.appendChild(link);
+        card.appendChild(favBtn);
+        frag.appendChild(card);
+      });
+
+      tvGrid.appendChild(frag);
+    }
+
+    function buildGenresAndLanguages(){
+      const genres = Array.from(new Set(channels.map(c=>c.channel_genre).filter(Boolean))).sort();
+      const langs = Array.from(new Set(channels.map(c=>c.channel_language || 'Unknown').filter(Boolean))).sort();
+
+      // chips
+      chipsEl.innerHTML = '';
+      const allChip = makeChip('All', true, ()=>{ selectedCategory='All'; activateChips('All'); renderGrid('All', searchTop.value); });
+      chipsEl.appendChild(allChip);
+
+      genres.forEach(g=>{
+        const chip = makeChip(g, false, ()=>{ selectedCategory=g; activateChips(g); renderGrid(g, searchTop.value); });
+        chipsEl.appendChild(chip);
+      });
+
+      // language select population
+      languageSelect.innerHTML = '<option value="all">All Languages</option>' + langs.map(l=>`<option value="${(l||'').toLowerCase()}">${l}</option>`).join('');
+      languageSelect.value = selectedLanguage || 'all';
+      languageSelect.addEventListener('change', ()=>{
+        selectedLanguage = languageSelect.value;
+        renderGrid(selectedCategory, searchTop.value);
+      });
+
+      // ensure select colors reflect theme
+      document.querySelectorAll('.select, .select option').forEach(el=>{
+        el.style.color = getComputedStyle(document.body).getPropertyValue('--text').trim();
+        el.style.background = getComputedStyle(document.body).getPropertyValue('--card').trim();
+      });
+    }
+
+    // Chip helpers
+    function makeChip(label, active, onClick){
+      const btn = document.createElement('button');
+      btn.className = 'chip' + (active ? ' active' : '');
+      btn.textContent = label;
+      btn.addEventListener('click', ()=>{
+        onClick && onClick();
+      });
+      return btn;
+    }
+    function activateChips(name){
+      document.querySelectorAll('#chips .chip').forEach(c=>c.classList.toggle('active', c.textContent === name));
+    }
+
+    /* ----------------------------
+       Fetch channels
+       ---------------------------- */
+    fetch(API).then(r=>r.json()).then(data=>{
+      channels = (data || []).map(ch=>({
+        channel_id: ch.channel_id,
+        channel_name: ch.channel_name,
+        channel_genre: ch.channel_genre || 'Unknown',
+        channel_logo: ch.channel_logo || 'https://via.placeholder.com/120?text=No+Logo',
+        channel_language: (ch.channel_language || ch.language || '').toString() || 'Unknown'
+      }));
+
+      buildGenresAndLanguages();
+      renderGrid(selectedCategory, searchTop.value);
+
+      // restore scroll if page navigated from player
+      const pos = parseInt(sessionStorage.getItem('scrollPos') || '0', 10);
+      if(!isNaN(pos) && pos > 0) window.scrollTo(0, pos);
+    }).catch(err=>{
+      console.error('Failed to load channels', err);
+      tvGrid.innerHTML = '<div class="muted" style="grid-column:1/-1;text-align:center;padding:40px">Failed to load channels. Try again later.</div>';
+    });
+
+    /* ----------------------------
+       Small accessibility helpers & misc
+       ---------------------------- */
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        closeDrawerFn();
+        closeSidebar();
+      }
+    });
+
+    // Utility to safely escape text for innerHTML injections in templates above
+    function escapeHtml(str){
+      if(!str && str !== 0) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Expose for debugging if needed
+    window._app = { renderGrid, toggleFavorite: toggleFavorite, channels };
+
+    // initial states
+    (function init(){
+      // start with sidebar hidden (visible only when user clicks)
+      sidebar.classList.remove('visible');
+      overlay.classList.remove('show');
+      // ensure select color initial sync
+      document.querySelectorAll('.select, .select option').forEach(el=>{
+        el.style.color = getComputedStyle(document.body).getPropertyValue('--text').trim();
+        el.style.background = getComputedStyle(document.body).getPropertyValue('--card').trim();
+      });
+    })();
+  </script>
+</body>
+</html>
